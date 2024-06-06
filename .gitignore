@@ -1,0 +1,5 @@
+# CMake builds
+build/
+debug/
+release/
+lib/export_web.sh
