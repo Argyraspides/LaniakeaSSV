@@ -1,9 +1,19 @@
 # CPP-WASM-TEMPLATE 
 ## Purpose:
-This is a template to quickly get started making applications for the web using C++. WebAssembly is the compilation target, and some neat tools are included including ImGui, SDL2, SDL2-gfx, and Emscripten to help with this.
-Build instructions are limited to Linux platforms at the moment, which includes the .vscode folder provided for non-EMCC compiler paths, although with slight tweaking you should be able to get it up and running on both Windows and macOS.
 
-The template includes a simple MVC pattern. Refer to the code comments to understand how the template works in full detail.
+This would probably best be suited for buildling single-page applications (SPAs) that run on the web. Check out my physics engine [here](https://gaugamela.me/Telos) as an example for what you can make with this template.
+
+This is a template to quickly get started making applications for the web using C++. Depending on your experience and goals this will save quite a bit of development time. WebAssembly is the compilation target, and some neat tools are included including ImGui, SDL2, SDL2-gfx, and Emscripten to help with this.
+
+Build instructions are limited to Linux platforms at the moment, although with slight tweaking you should be able to get it up and running on both Windows and macOS.
+
+I have included a .vscode folder provided for emcc and gcc compiler paths on Linux-based platforms and some some simple build scripts for running locally, debugging locally, or running for the web.
+
+The template is a simple MVC pattern You can immediately start adding anything to ``my_view.cpp`` in the source folder for rendering and handling user input events. You have full access to the ``SDL_Renderer`` for rendering whatever you want, ``SDL_Event`` for event general event handling and ``ImGuiIO`` for all things ImGui related.
+
+The model, view, and controller all run on separate threads. The view itself is split into two threads: one for rendering and one for handling input events (through ``SDL_Event``)
+
+The controller and model is, of course, completely up to you as to how you implement it as that will be completely dependent on what you want to make. The only thing to note that the ``run`` function in the model is mandatory as it is the function invoked by its thread, and this will be the models ``main`` function, basically.
 
 ## "Prerequisites"
 - ### [WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly) compatible browser
