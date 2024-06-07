@@ -23,7 +23,7 @@ View::View(Controller *controller, MyView *myView)
     m_VIEW_POLLING_RATE = 60;
     m_VIEW_INPUT_POLLING_RATE = 60;
     m_window_flags = (SDL_WindowFlags)(SDL_WINDOW_ALLOW_HIGHDPI);
-    ImVec4 m_clearColor = TELOS_IMGUI_DARKGRAY;
+    ImVec4 m_clearColor = ImVec4(30.0f / 255, 30.0f / 255, 30.0f / 255, 30.0f / 255);
     m_controller = controller;
     m_myView = myView;
     done = false;
@@ -73,7 +73,6 @@ void View::Render()
 
     const std::chrono::milliseconds frameDuration(1000 / m_VIEW_POLLING_RATE);
     auto startTime = std::chrono::high_resolution_clock::now();
-    m_clearColor = TELOS_IMGUI_DARKGRAY;
 
 #ifdef __EMSCRIPTEN__
     io.IniFilename = nullptr;

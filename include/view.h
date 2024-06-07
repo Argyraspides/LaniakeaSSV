@@ -1,7 +1,6 @@
 #pragma once
 
 #include "imgui.h"
-#include "telos_imgui_colors.h"
 #include "controller.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
@@ -53,9 +52,9 @@ public:
 
     // SDL BOILERPLATE TO SET UP THE WINDOW AND RENDERER
     int m_SCREEN_WIDTH, m_SCREEN_HEIGHT;        // SCREEN DIMENSIONS
-    int m_VIEW_POLLING_RATE = 60;               // HOW MANY TIMES PER SECOND THE VIEW REFRESHES
-    int m_VIEW_INPUT_POLLING_RATE = 60;         // HOW MANY TIMES PER SECOND THE VIEW WILL POLL FOR INPUTS
-    ImVec4 m_clearColor = TELOS_IMGUI_DARKGRAY; // BACKGROUND COLOR
+    int m_VIEW_POLLING_RATE;               // HOW MANY TIMES PER SECOND THE VIEW REFRESHES
+    int m_VIEW_INPUT_POLLING_RATE;         // HOW MANY TIMES PER SECOND THE VIEW WILL POLL FOR INPUTS
+    ImVec4 m_clearColor; // BACKGROUND COLOR
     SDL_WindowFlags m_window_flags;             // WINDOW FLAGS
     SDL_Window *m_window;                       // SDL WINDOW
     SDL_Renderer *m_renderer;                   // SDL RENDERER
