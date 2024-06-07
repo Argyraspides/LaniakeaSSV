@@ -11,7 +11,7 @@ I have included a .vscode folder provided for emcc and gcc compiler paths on Lin
 
 The template is a simple MVC pattern You can immediately start adding anything to ``my_view.cpp`` in the source folder for rendering and handling user input events. You have full access to the ``SDL_Renderer`` for rendering whatever you want, ``SDL_Event`` for event general event handling and ``ImGuiIO`` for all things ImGui related.
 
-The model, view, and controller all run on separate threads. The view itself is split into two threads: one for rendering and one for handling input events (through ``SDL_Event``)
+The model, view, and controller all run on separate threads, so it's vital you ensure some sort of thread safety between these components. The view itself is split into two threads: one for rendering and one for handling input events (through ``SDL_Event``)
 
 The controller and model is, of course, completely up to you as to how you implement it as that will be completely dependent on what you want to make. The only thing to note that the ``run`` function in the model is mandatory as it is the function invoked by its thread, and this will be the models ``main`` function, basically.
 
