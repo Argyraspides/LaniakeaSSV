@@ -7,7 +7,6 @@
 #include "model.h"
 #include "my_view.h"
 
-
 #include <vector>
 #include <array>
 #include <SDL.h>
@@ -51,13 +50,13 @@ public:
     MyView *m_myView;                           // PATH TO THE USER DEFINED FUNCTIONS TO RENDER WHATEVER
 
     // SDL BOILERPLATE TO SET UP THE WINDOW AND RENDERER
-    int m_SCREEN_WIDTH, m_SCREEN_HEIGHT;        // SCREEN DIMENSIONS
-    int m_VIEW_POLLING_RATE;               // HOW MANY TIMES PER SECOND THE VIEW REFRESHES
-    int m_VIEW_INPUT_POLLING_RATE;         // HOW MANY TIMES PER SECOND THE VIEW WILL POLL FOR INPUTS
-    ImVec4 m_clearColor; // BACKGROUND COLOR
-    SDL_WindowFlags m_window_flags;             // WINDOW FLAGS
-    SDL_Window *m_window;                       // SDL WINDOW
-    SDL_Renderer *m_renderer;                   // SDL RENDERER
+    int m_SCREEN_WIDTH, m_SCREEN_HEIGHT; // SCREEN DIMENSIONS
+    int m_VIEW_POLLING_RATE;             // HOW MANY TIMES PER SECOND THE VIEW REFRESHES
+    int m_VIEW_INPUT_POLLING_RATE;       // HOW MANY TIMES PER SECOND THE VIEW WILL POLL FOR INPUTS
+    ImVec4 m_clearColor;                 // BACKGROUND COLOR
+    SDL_WindowFlags m_window_flags;      // WINDOW FLAGS
+    SDL_Window *m_window;                // SDL WINDOW
+    SDL_Renderer *m_renderer;            // SDL RENDERER
 
     // SDL WASN'T REALLY MEANT TO BE MULTITHREADED. AS A WORKAROUND, THE THREAD WHICH CREATED THE WINDOW AND RENDERER WILL CONSTANTLY POLL EVENTS AND ADD IT TO THIS
     // VECTOR ARRAY, WHERE OTHER THREADS CAN INSPECT THEM, RATHER THAN EACH THREAD CREATING ITS OWN EVENTS WHICH GIVES WEIRD BEHAVIOR

@@ -18,19 +18,19 @@
 
 View::View(Controller *controller, MyView *myView)
 {
-    m_SCREEN_WIDTH = 1280;
-    m_SCREEN_HEIGHT = 720;
+    m_myView = myView;
+    m_controller = controller;
+
+    ImVec4 m_clearColor = ImVec4(30.0f / 255, 30.0f / 255, 30.0f / 255, 30.0f / 255);
+
     m_VIEW_POLLING_RATE = 60;
     m_VIEW_INPUT_POLLING_RATE = 60;
-    m_window_flags = (SDL_WindowFlags)(SDL_WINDOW_ALLOW_HIGHDPI);
-    ImVec4 m_clearColor = ImVec4(30.0f / 255, 30.0f / 255, 30.0f / 255, 30.0f / 255);
-    m_controller = controller;
-    m_myView = myView;
+
+    m_myView->SDLSetup(&m_renderer, &m_window);
+
     done = false;
     m_renderDone = true;
     m_inputDone = true;
-    m_window = SDL_CreateWindow("Telos", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_SCREEN_WIDTH, m_SCREEN_HEIGHT, m_window_flags);
-    m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 }
 
 View::~View()
@@ -61,9 +61,7 @@ void View::Render()
     }
 
     // Setup ImGui
-    ImGuiIO &io = SetupImGui();
-    ImGui::StyleColorsDark();
-    ImGui::GetStyle().Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImGuiIO &io = m_myView->ImGuiSetup();
 
     ImGui_ImplSDL2_InitForSDLRenderer(m_window, m_renderer);
     ImGui_ImplSDLRenderer2_Init(m_renderer);
@@ -113,22 +111,6 @@ void View::CleanupImGui()
     ImGui::DestroyContext();
 }
 
-ImGuiIO &View::SetupImGui()
-{
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    io.FontGlobalScale = 1.25f;
-
-    // Add custom font (optional)
-    // std::string fontPath = std::filesystem::current_path().string() + "/assets/Roboto/Roboto-Black.ttf";
-    // io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 25.0f);
-
-    return io;
-}
-
 void View::HandleSDLEvents()
 {
     SDL_Event event;
@@ -150,22 +132,17 @@ void View::HandleSDLEvents()
     m_renderDone = true;
 }
 
-// THIS IS THE FUNCTION WHERE YOU WILL PUT STUFF YOU WANT TO RENDER, BOTH IMGUI AND SDL
 void View::RenderFrame(ImGuiIO &io)
 {
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    // RENDER IMGUI STUFF HERE, (DEMO WINDOW AS A SAMPLE)
     m_myView->RenderImGui(io);
 
     ImGui::Render();
     SDL_RenderSetScale(m_renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-    SDL_SetRenderDrawColor(m_renderer, static_cast<Uint8>(m_clearColor.x * 255), static_cast<Uint8>(m_clearColor.y * 255), static_cast<Uint8>(m_clearColor.z * 255), static_cast<Uint8>(m_clearColor.w * 255));
-    SDL_RenderClear(m_renderer);
-
-    // RENDER OTHER STUFF HERE
+   
     m_myView->RenderSDL(*m_renderer);
 
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());

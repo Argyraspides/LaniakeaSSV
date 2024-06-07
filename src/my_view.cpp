@@ -1,5 +1,4 @@
 #include "my_view.h"
-
 // Add whatever ImGui stuff you want to render here
 void MyView::RenderImGui(ImGuiIO &io)
 {
@@ -9,7 +8,9 @@ void MyView::RenderImGui(ImGuiIO &io)
 // Add whatever SDL stuff you want to render here.
 void MyView::RenderSDL(SDL_Renderer &renderer)
 {
-    DrawCircle(renderer); // Draw a circle as an example.
+    SDL_SetRenderDrawColor(&renderer, 0, 0, 0, 0);
+    SDL_RenderClear(&renderer); // Clear the renderer with the set color (black in this case: (0,0,0,0))
+    DrawCircle(renderer);       // Draw a circle as an example.
 }
 
 // Handle SDL events here
@@ -18,17 +19,33 @@ void MyView::HandleSDLEvents(SDL_Event &event)
     QuitOnPressQ(event); // Quit the program when 'q' is pressed as an example
 }
 
+// SETUP & EXAMPLE FUNCTIONS BELOW ************************************************************************************
+// ********************************************************************************************************************
 
+// Set up SDL stuff here. This will be called after SDLWindowSetup.
+void MyView::SDLSetup(SDL_Renderer **renderer, SDL_Window **window)
+{
+    SDL_WindowFlags f = (SDL_WindowFlags)(SDL_WINDOW_ALLOW_HIGHDPI);
+    *window = SDL_CreateWindow("Telos", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080, f);
+    *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+}
 
+// Set up anything related to ImGui here. This is the last thing called before the application loop starts.
+// An example on how to set up ImGui is provided below.
+ImGuiIO &MyView::ImGuiSetup()
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    io.FontGlobalScale = 1.25f;
 
+    ImGui::StyleColorsDark();
+    ImGui::GetStyle().Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-
-
-
-
-
-
-
+    return io;
+}
 
 // Create functions here or wherever else you'd like to render your stuff and handle input events. Here is a function
 // to get SDL2 to draw a circle as an example.
