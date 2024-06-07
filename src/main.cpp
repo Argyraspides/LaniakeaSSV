@@ -1,7 +1,7 @@
 #include "model.h"
 #include "view.h"
+#include "my_view.h"
 #include "controller.h"
-
 int main()
 {
     // Instantiate the physics engine
@@ -14,8 +14,9 @@ int main()
     // Create a controller, pass in our model instance
     Controller c(&m);
 
-    // Create a view, pass in our controller instance
-    View v(&c);
+    // Create a view, pass in our controller instance, and a MyView instance 
+    MyView mv;
+    View v(&c, &mv);
     // Start rendering loop for the view
     v.Render();
 

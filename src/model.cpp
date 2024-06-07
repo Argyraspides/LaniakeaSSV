@@ -3,6 +3,8 @@
 #include <iostream>
 #include <algorithm>
 
+// Completely up to you how you want to implement this.
+
 Model::Model()
 {
 }

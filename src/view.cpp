@@ -16,7 +16,7 @@
 #include "emscripten_browser_clipboard.h"
 #endif
 
-View::View(Controller *controller)
+View::View(Controller *controller, MyView *myView)
 {
     m_SCREEN_WIDTH = 1280;
     m_SCREEN_HEIGHT = 720;
@@ -25,6 +25,7 @@ View::View(Controller *controller)
     m_window_flags = (SDL_WindowFlags)(SDL_WINDOW_ALLOW_HIGHDPI);
     ImVec4 m_clearColor = TELOS_IMGUI_DARKGRAY;
     m_controller = controller;
+    m_myView = myView;
     done = false;
     m_renderDone = true;
     m_inputDone = true;
@@ -158,7 +159,7 @@ void View::RenderFrame(ImGuiIO &io)
     ImGui::NewFrame();
 
     // RENDER IMGUI STUFF HERE, (DEMO WINDOW AS A SAMPLE)
-    ImGui::ShowDemoWindow();
+    m_myView->RenderImGui(io);
 
     ImGui::Render();
     SDL_RenderSetScale(m_renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
@@ -166,15 +167,12 @@ void View::RenderFrame(ImGuiIO &io)
     SDL_RenderClear(m_renderer);
 
     // RENDER OTHER STUFF HERE
+    m_myView->RenderSDL(*m_renderer);
 
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(m_renderer);
 }
 
-void View::SDL_ViewportHandler(SDL_Event &event)
-{
-    // Implement viewport handling here
-}
 
 void View::SDL_EventHandlingLoop()
 {
@@ -189,7 +187,7 @@ void View::SDL_EventHandlingLoop()
         {
             for (SDL_Event &event : GetFrameEvents())
             {
-                SDL_ViewportHandler(event);
+                m_myView->HandleSDLEvents(event);
             }
             if (m_renderDone)
                 GetFrameEvents().clear();

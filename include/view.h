@@ -6,6 +6,8 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
 #include "model.h"
+#include "my_view.h"
+
 
 #include <vector>
 #include <array>
@@ -27,7 +29,7 @@ class View
 {
 
 public:
-    View(Controller *controller);
+    View(Controller *controller, MyView *myView);
     ~View();
 
     // AN ENTRY POINT FOR A THREAD TO THE NEW THREAD THAT WILL BE CREATED TO HANDLE INPUTS ON THE WORLD SCENE, SEPARATE FROM IMGUI INPUTS
@@ -47,6 +49,7 @@ public:
     void HandleSDLEvents();                     // HANDLES SDL EVENTS
     void RenderFrame(ImGuiIO &io);              // RENDERS THE FRAME
     Controller *m_controller;                   // CONTROLLER INTERFACE TO MANIPULATE AND/OR RETRIEVE DATA FROM THE MODEL
+    MyView *m_myView;                           // PATH TO THE USER DEFINED FUNCTIONS TO RENDER WHATEVER
 
     // SDL BOILERPLATE TO SET UP THE WINDOW AND RENDERER
     int m_SCREEN_WIDTH, m_SCREEN_HEIGHT;        // SCREEN DIMENSIONS
