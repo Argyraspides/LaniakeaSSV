@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include "my_view_interface.h"
+#include "controller.h"
 #include "imgui.h"
 #include <stdio.h>
 
@@ -8,6 +9,10 @@ class MyView : public MyViewInterface
 {
 
 public:
+
+    MyView(Controller *controller) : m_controller(controller) {}
+
+    Controller* m_controller;
     void RenderImGui(ImGuiIO &io) override;                               // Render ImGui stuff here
     void RenderSDL(SDL_Renderer &renderer) override;                      // Render SDL stuff here
     void HandleSDLEvents(SDL_Event &event) override;                      // Handle SDL events here

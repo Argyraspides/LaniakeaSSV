@@ -20,7 +20,7 @@
 // HERE IS A STOWED AWAY "HACK" THAT LETS US DEFINE WHICH PART OF OUR CODE WE WANT EMSCRIPTEN TO WORRY ABOUT WITHOUT NEEDING TO
 // GIVE OURSELVES A HEADACHE BY DESIGNING THE APPLICATION AROUND EMSCRIPTENS REQUIREMENTS.
 #ifdef __EMSCRIPTEN__
-#include "../lib/imgui/examples/libs/emscripten/emscripten_mainloop_stub.h"
+#include "../../lib/imgui/examples/libs/emscripten/emscripten_mainloop_stub.h"
 #endif
 
 class View

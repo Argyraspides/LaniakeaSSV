@@ -19,7 +19,7 @@ int main()
     // Create a view, pass in our controller instance, and a MyView instance.
     // View is completely abstracted away for you. You only need to care about MyView
     // for implementing your own rendering and event handling.
-    MyView mv;
+    MyView mv(&c);
     View v(&c, &mv);
 
     // Start rendering loop for the view (this also handles events and rendering ImGui)

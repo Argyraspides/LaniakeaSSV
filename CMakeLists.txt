@@ -1,12 +1,24 @@
+##############################################################################################################
+# SETUP CMAKE
+
 cmake_minimum_required(VERSION 3.22)
 project(Telos)
 set(CMAKE_CXX_STANDARD 17)
 set(MY_COMPILER "default" CACHE STRING "Choose a compiler: 'emcc', or 'gcc'")
 
-file(GLOB SOURCES 
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" # Telos source and header files
+##############################################################################################################
+# GRAB ALL SOURCE FILES
+
+# RECURSIVELY OBTAIN ALL SOURCE FILES FOR LANIAKEA
+file(GLOB_RECURSE LANIAKEASSV_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/*.cpp" # ImGui source and header files.
+)
+
+# SOURCE FILES FOR IMGUI, SDL2_GFX, AND LANIAKEA
+file(GLOB SOURCES 
+    ${LANIAKEASSV_SOURCES}
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/*.cpp" 
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/backends/imgui_impl_sdl2.h" 
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/backends/imgui_impl_sdl2.cpp"
@@ -16,58 +28,91 @@ file(GLOB SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/backends/imgui_impl_sdlrenderer2.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_gfx-1.0.4/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_gfx-1.0.4/*.cpp"
-
 )
-
-# SDL2 already has it's own CMakeLists.txt, so we don't need to worry about it. We can just
-# Add its location.
+##############################################################################################################
+# ADD SDL2 AS A LIBRARY. IT ALREADY HAS ITS OWN CMAKELISTS.TXT SO WE CAN JUST STRAIGHT UP ADD THE SUBDIRECTORY
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2")
 
-# We add our imgui as a library
+
+##############################################################################################################
+# ADD IMGUI AS A STATIC LIBRARY
 add_library(imgui STATIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/imgui.cpp")
 
 
-# Add our gfx library (not native to SDL2).
+##############################################################################################################
+# ADD SDL2_GFX AS A STATIC LIBRARY AS WELL
 file(GLOB SDL2GFX_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_gfx-1.0.4/*.cpp")
 add_library(SDL2GFX STATIC ${SDL2GFX_SOURCES})
 
 
-# All include directories for .h files
-include_directories(
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2/include" # SDL2
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui" # ImGui
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/backends"
-   # "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/examples/libs/emscripten/emscripten_mainloop_stub.h"
-   # "${CMAKE_CURRENT_SOURCE_DIR}/lib/emsdk/upstream/emscripten/cache/sysroot/include" # Emscripten 
-    "${CMAKE_CURRENT_SOURCE_DIR}/include" # Telos
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_gfx-1.0.4" 
+##############################################################################################################
+# RECURSIVELY OBTAIN ALL DIRECTORIES THAT HAVE .H FILES FOR THE PROJECT
+file(GLOB_RECURSE PROJECT_INCLUDE_DIRS LIST_DIRECTORIES true
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*"  
 )
 
-#OpenGL is literally so common surely i dont need to add this myself lmao.
+# ONLY KEEP THE PATHS TO THE DIRECTORIES AND NOT FILES THEMSELVES
+foreach(header_file IN LISTS PROJECT_INCLUDE_DIRS)
+     get_filename_component(dir_path ${header_file} DIRECTORY)
+     list(APPEND PROJECT_INCLUDES ${dir_path})
+endforeach()
+
+# REMOVE DUPLICATE DIRECTORY PATHS
+list(REMOVE_DUPLICATES PROJECT_INCLUDES) 
+
+
+# LET CMAKE KNOW OF ALL INCLUDE DIRECTORIES FOR SDL2, IMGUI, CURLPP, AND THE PROJECT
+include_directories(
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2/include"                      # SDL2
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2_gfx-1.0.4"                    # SDL2_GFX
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui"                             # IMGUI
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/backends"                    # IMGUI BACKENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/examples/libs/emscripten"    # IMGUI EMSCRIPTEN
+    ${PROJECT_INCLUDES}                                                 # THE PROJECT ITSELF
+
+    # WHEN WE RECURSIVELY SEARCHED FOR DIRECTORIES INSIDE OF /INCLUDE, THIS 
+    # DID NOT INCLUDE THE /INCLUDE DIRECTORY ITSELF. SO WE NEED TO ADD IT MANUALLY
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"                               
+)
+
+
+
+##############################################################################################################
+# ADD THE EXECUTABLE
 add_executable(${PROJECT_NAME} ${SOURCES}) 
+
+
+##############################################################################################################
+# FIND OPENGL
 find_package(OpenGL REQUIRED)
 
-# If we are building to run on a web browser, we need to use the EMCC compiler.
+##############################################################################################################
+# IF WE ARE BUILDING TO RUN ON A WEB BROWSER, WE NEED TO USE THE EMCC COMPILER.
 if(MY_COMPILER STREQUAL "emcc")
 
-    # Set the compiler. This is bundled in the emscripten SDK.
+    # SET THE COMPILER TO EMCC
     set(CMAKE_CXX_COMPILER "${CMAKE_CURRENT_SOURCE_DIR}/lib/emsdk/upstream/emscripten/emcc")
-    # Emscripten is a C++-to-JS compiler, so we want our output to be a .js file and not a normal binary
+    # SET THE EXECUTABLE SUFFIX TO .JS
     set(CMAKE_EXECUTABLE_SUFFIX ".js")
-    # Emscripten is compatible with SDL2, so we use this flag to enable it ("-s USE_SDL=2")
-    # For this particular build, the model is run in a separate thread from the view and controller,
-    # so we enable multi-threaded support by passing in -pthread and the max number of threads we are allowed
-    # to allocate (in this case as many threads as there are CPU cores)
-    # Obviously, any files outside of what is included by the compiler, that would be accessible on our local machine (as they still exist
-    # on the computer), will not be accessible by the web browser once we compile to web assembly. Any extra files that we want to access
-    # must be preloaded in order for us to access them, hence --preload-file
-    # -O2 is the compiler optimization. For the web, we want our WASM and JS files to be as small as possible, but also balance for 
-    # performance, -O2 is a good tradeoff from -O3 for this reason 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1 -s USE_SDL=2 -pthread -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency -s TOTAL_MEMORY=512MB --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets/Roboto@assets/Roboto -O3")
-
+    # SET THE COMPILER FLAGS
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s FETCH")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s TOTAL_MEMORY=512MB")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets/Roboto@assets/Roboto")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    
+    # include_directories("${CURL_INCLUDE_DIRS}")  # Ensure curl include directory is set
     link_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2")
-    target_link_libraries(${PROJECT_NAME} "imgui" "SDL2GFX")
+
+    target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/include")
+    target_link_libraries(${PROJECT_NAME} "imgui" "SDL2GFX" "curlpp")
 
 elseif((MY_COMPILER STREQUAL "gcc")) 
-    target_link_libraries(${PROJECT_NAME} "SDL2" "SDL2GFX" "imgui" "OpenGL::GL" )
+    target_link_libraries(${PROJECT_NAME} "SDL2" "SDL2GFX" "imgui" "OpenGL::GL")
 endif() 
+
+
+##############################################################################################################

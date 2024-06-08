@@ -1,4 +1,8 @@
 #include "my_view.h"
+#include "hermes.h"
+#include "BUILD_EMCC.h"
+
+#include <iostream>
 // Add whatever ImGui stuff you want to render here
 void MyView::RenderImGui(ImGuiIO &io)
 {
@@ -80,7 +84,9 @@ void MyView::QuitOnPressQ(SDL_Event &event)
     {
         if (event.key.keysym.sym == SDLK_q)
         {
-            exit(0);
+            #ifdef BUILD_EMCC
+                std::cout << Hermes::GET("https://httpbin.org/get") << std::endl;
+            #endif
         }
     }
 }
