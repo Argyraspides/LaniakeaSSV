@@ -82,13 +82,12 @@ void MyView::QuitOnPressQ(SDL_Event &event)
 {
     if (event.type == SDL_KEYDOWN)
     {
-        char* dat;
+        char *dat;
         if (event.key.keysym.sym == SDLK_q)
         {
-            #ifdef BUILD_EMCC
-            ApiResponse resp = Hermes::GET("https://httpbin.org/get");
-           
-            #endif
+#ifdef BUILD_EMCC
+            ApiResponse resp = Hermes::POST("https://reqres.in/api/users", "{\"name\": \"morpheus\", \"job\": \"leader\"}");
+#endif
         }
     }
 }
