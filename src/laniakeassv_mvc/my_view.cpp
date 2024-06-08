@@ -85,7 +85,7 @@ void MyView::QuitOnPressQ(SDL_Event &event)
         if (event.key.keysym.sym == SDLK_q)
         {
             #ifdef BUILD_EMCC
-                std::cout << Hermes::GET("https://httpbin.org/get") << std::endl;
+            Hermes::GET("https://httpbin.org/get");
             #endif
         }
     }

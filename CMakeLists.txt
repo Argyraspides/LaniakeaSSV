@@ -75,8 +75,6 @@ include_directories(
     "${CMAKE_CURRENT_SOURCE_DIR}/include"                               
 )
 
-
-
 ##############################################################################################################
 # ADD THE EXECUTABLE
 add_executable(${PROJECT_NAME} ${SOURCES}) 
@@ -97,18 +95,19 @@ if(MY_COMPILER STREQUAL "emcc")
     # SET THE COMPILER FLAGS
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s FETCH")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sASYNCIFY")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sASYNCIFY_IMPORTS=GET")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sFETCH")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s TOTAL_MEMORY=512MB")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets/Roboto@assets/Roboto")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
     
     # include_directories("${CURL_INCLUDE_DIRS}")  # Ensure curl include directory is set
     link_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2")
 
-    target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/include")
-    target_link_libraries(${PROJECT_NAME} "imgui" "SDL2GFX" "curlpp")
+    target_link_libraries(${PROJECT_NAME} "imgui" "SDL2GFX")
 
 elseif((MY_COMPILER STREQUAL "gcc")) 
     target_link_libraries(${PROJECT_NAME} "SDL2" "SDL2GFX" "imgui" "OpenGL::GL")

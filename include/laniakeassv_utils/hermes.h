@@ -1,22 +1,27 @@
 // File: hermes.h
 // This file is part of the Laniakea SSV project.
-// It contains utility functions to make GET, POST, and other HTTP requests
+// It contains functions to make standard HTTP requests in JavaScript through C++
+
 #pragma once
 #include "BUILD_EMCC.h"
 
 #ifdef BUILD_EMCC
 #include <string>
 #include <functional>
-#include <iostream>
-#include <sstream>
+#include <emscripten/emscripten.h>
+#include <emscripten/val.h>
 
 namespace Hermes
 {
 
-    std::string GET(const std::string &url)
-    {
-        
-    }
+    EM_JS(void, GET, (const char* url), {
+        return Asyncify.handleAsync(async function() {
+            const response = await fetch(UTF8ToString(url));
+            const data = await response.json();
+            console.log(JSON.stringify(data));
+        });
+    });
+
 }
 
 #endif
