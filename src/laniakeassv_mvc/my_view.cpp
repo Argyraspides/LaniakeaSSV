@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
+
 // Add whatever ImGui stuff you want to render here
 void MyView::RenderImGui(ImGuiIO &io)
 {
@@ -88,7 +88,7 @@ void MyView::QuitOnPressQ(SDL_Event &event)
         if (event.key.keysym.sym == SDLK_q)
         {
 #ifdef BUILD_EMCC
-            json data = {
+            nlohmann::json data = {
                 {"name", "morpheus"},
                 {"job", "leader"}
             };

@@ -13,9 +13,17 @@
 #include "api_response.h"
 #include <nlohmann/json.hpp>
 
+// Hermes works by using EM_JS to call JavaScript functions that make HTTP requests
+// EM_JS takes in a C++ function signature (return type, function name, and parameters) and a JavaScript function body.
+// The JS functions are wrapped with the Asyncify.handleAsync() function, which allows the function to be called asynchronously
+// within the actual function body, but called in a synchronous manner in C++.
+// Asyncify has to be enabled in the compiler flags for this to work (it is an emscripten-specific feature)
+// See: https://emscripten.org/docs/porting/asyncify.html for more detail
+
+// The API functions to be used are "GET," "POST," etc. These wrap the API return in an 
+// ApiResponse struct, which automatically frees the memory when it goes out of scope.
 namespace Hermes
 {
-
     EM_JS(char *, EM_JS_GET, (const char *url), {
         return Asyncify.handleAsync(async function() {
             
@@ -70,7 +78,6 @@ namespace Hermes
     {
         return ApiResponse(EM_JS_GET(url));
     }
-
 
     ApiResponse POST(const char *url, const nlohmann::json &requestBody = {})
     {
