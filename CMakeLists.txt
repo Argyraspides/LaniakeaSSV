@@ -33,6 +33,9 @@ file(GLOB SOURCES
 # ADD SDL2 AS A LIBRARY. IT ALREADY HAS ITS OWN CMAKELISTS.TXT SO WE CAN JUST STRAIGHT UP ADD THE SUBDIRECTORY
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2")
 
+# ADD JSON AS A LIBRARY. IT ALREADY HAS ITS OWN CMAKELISTS.TXT SO WE CAN JUST STRAIGHT UP ADD THE SUBDIRECTORY
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/json-3.11.3")
+
 
 ##############################################################################################################
 # ADD IMGUI AS A STATIC LIBRARY
@@ -49,6 +52,8 @@ add_library(SDL2GFX STATIC ${SDL2GFX_SOURCES})
 # RECURSIVELY OBTAIN ALL DIRECTORIES THAT HAVE .H FILES FOR THE PROJECT
 file(GLOB_RECURSE PROJECT_INCLUDE_DIRS LIST_DIRECTORIES true
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/json-3.11.3/include/*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/json-3.11.3/single_include/*"
 )
 
 # ONLY KEEP THE PATHS TO THE DIRECTORIES AND NOT FILES THEMSELVES
@@ -70,9 +75,12 @@ include_directories(
     "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/examples/libs/emscripten"    # IMGUI EMSCRIPTEN
     ${PROJECT_INCLUDES}                                                 # THE PROJECT ITSELF
 
-    # WHEN WE RECURSIVELY SEARCHED FOR DIRECTORIES INSIDE OF /INCLUDE, THIS 
-    # DID NOT INCLUDE THE /INCLUDE DIRECTORY ITSELF. SO WE NEED TO ADD IT MANUALLY
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"                               
+    # WHEN WE RECURSIVELY SEARCHED FOR DIRECTORIES INSIDE OF /INCLUDE, 
+    # FOR BOTH JSON-3.11.3 AND THE PROJECT, WE ONLY GOT THE INNER DIRECTORIES, 
+    # WE DID NOT INCLUDE THE /INCLUDE DIRECTORIES THEMSELVES. SO WE NEED TO ADD IT MANUALLY
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"           
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/json-3.11.3/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/json-3.11.3/single_include"                    
 )
 
 ##############################################################################################################
@@ -106,11 +114,12 @@ if(MY_COMPILER STREQUAL "emcc")
     
     # include_directories("${CURL_INCLUDE_DIRS}")  # Ensure curl include directory is set
     link_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/SDL2")
+    link_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/json-3.11.3")
 
     target_link_libraries(${PROJECT_NAME} "imgui" "SDL2GFX")
 
 elseif((MY_COMPILER STREQUAL "gcc")) 
-    target_link_libraries(${PROJECT_NAME} "SDL2" "SDL2GFX" "imgui" "OpenGL::GL")
+    target_link_libraries(${PROJECT_NAME} "SDL2" "SDL2GFX" "imgui" "OpenGL::GL" "json-3.11.3")
 endif() 
 
 

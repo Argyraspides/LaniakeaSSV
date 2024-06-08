@@ -3,6 +3,8 @@
 #include "BUILD_EMCC.h"
 #include <cstdlib>
 #include <iostream>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 // Add whatever ImGui stuff you want to render here
 void MyView::RenderImGui(ImGuiIO &io)
 {
@@ -86,7 +88,12 @@ void MyView::QuitOnPressQ(SDL_Event &event)
         if (event.key.keysym.sym == SDLK_q)
         {
 #ifdef BUILD_EMCC
-            ApiResponse resp = Hermes::POST("https://reqres.in/api/users", "{\"name\": \"morpheus\", \"job\": \"leader\"}");
+            json data = {
+                {"name", "morpheus"},
+                {"job", "leader"}
+            };
+            ApiResponse resp = Hermes::POST("https://reqres.in/api/users", data.dump().c_str());
+            std::cout << resp.data << std::endl;
 #endif
         }
     }

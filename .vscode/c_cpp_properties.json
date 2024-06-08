@@ -10,7 +10,8 @@
                 "${workspaceFolder}/lib/SDL2/include/**",
                 "${workspaceFolder}/lib/imgui/**",
                 "${workspaceFolder}/lib/SDL2_gfx-1.0.4/**",
-                "${workspaceFolder}/lib/curlpp/include/**",
+                "${workspaceFolder}/lib/json-3.11.3/include/**",
+                "${workspaceFolder}/lib/json-3.11.3/single_include/**",
                 "${workspaceFolder}/include/**",
                 "${workspaceFolder}/lib/emsdk/upstream/emscripten/cache/sysroot/include/**"
             ]
