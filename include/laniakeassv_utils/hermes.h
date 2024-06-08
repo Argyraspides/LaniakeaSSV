@@ -10,17 +10,34 @@
 #include <functional>
 #include <emscripten/emscripten.h>
 #include <emscripten/val.h>
+#include "api_response.h"
 
 namespace Hermes
 {
 
-    EM_JS(void, GET, (const char* url), {
+    EM_JS(char *, EM_JS_GET, (const char *url), {
         return Asyncify.handleAsync(async function() {
+            
             const response = await fetch(UTF8ToString(url));
             const data = await response.json();
-            console.log(JSON.stringify(data));
+            const jsonString = JSON.stringify(data);
+
+            // JS and C++ represent strings differently, so we need to convert the string to a format that C++ can understand.
+            // _malloc() allocates memory on the WASM heap, and stringToUTF8() copies the string to that memory.
+            const lengthBytes = lengthBytesUTF8(jsonString) + 1;
+
+            // Malloc MUST be freed. This is done through the ApiResponse destructor.
+            const stringOnWasmHeap = _malloc(lengthBytes);
+            stringToUTF8(jsonString, stringOnWasmHeap, lengthBytes);
+
+            return stringOnWasmHeap;
         });
     });
+
+    ApiResponse GET(const char *url)
+    {
+        return ApiResponse(EM_JS_GET(url));
+    }
 
 }
 

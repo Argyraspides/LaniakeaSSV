@@ -1,7 +1,7 @@
 #include "my_view.h"
 #include "hermes.h"
 #include "BUILD_EMCC.h"
-
+#include <cstdlib>
 #include <iostream>
 // Add whatever ImGui stuff you want to render here
 void MyView::RenderImGui(ImGuiIO &io)
@@ -82,10 +82,12 @@ void MyView::QuitOnPressQ(SDL_Event &event)
 {
     if (event.type == SDL_KEYDOWN)
     {
+        char* dat;
         if (event.key.keysym.sym == SDLK_q)
         {
             #ifdef BUILD_EMCC
-            Hermes::GET("https://httpbin.org/get");
+            ApiResponse resp = Hermes::GET("https://httpbin.org/get");
+           
             #endif
         }
     }
