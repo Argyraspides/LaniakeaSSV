@@ -92,7 +92,7 @@ void MyView::QuitOnPressQ(SDL_Event &event)
                 {"name", "morpheus"},
                 {"job", "leader"}
             };
-            ApiResponse resp = Hermes::POST("https://reqres.in/api/users", data.dump().c_str());
+            ApiResponse resp = Hermes::POST("https://reqres.in/api/users", data);
             std::cout << resp.data << std::endl;
 #endif
         }

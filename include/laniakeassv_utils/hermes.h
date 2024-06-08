@@ -11,6 +11,7 @@
 #include <emscripten/emscripten.h>
 #include <emscripten/val.h>
 #include "api_response.h"
+#include <nlohmann/json.hpp>
 
 namespace Hermes
 {
@@ -68,6 +69,12 @@ namespace Hermes
     ApiResponse GET(const char *url)
     {
         return ApiResponse(EM_JS_GET(url));
+    }
+
+
+    ApiResponse POST(const char *url, const nlohmann::json &requestBody = {})
+    {
+        return ApiResponse(EM_JS_POST(url, requestBody.dump().c_str()));
     }
 
     ApiResponse POST(const char *url, const char *data = "{}")
